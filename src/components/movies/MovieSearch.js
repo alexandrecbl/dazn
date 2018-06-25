@@ -6,11 +6,7 @@ class MovieSearch extends React.Component {
         this.state = {searchKey: ""};
     }
 
-
     handleChange = (event) => {
-        this.setState({
-            searchKey: event.target.value
-        });
 
         this.props.onChange(event.target.value)
     };
@@ -21,8 +17,8 @@ class MovieSearch extends React.Component {
             <div>
                 <input
                     type="text"
-                    value={this.state.key}
-                    placeholder="Enter search term"
+                    value={this.props.searchKey}
+                    placeholder= "Enter search term"
                     className="form-control"
                     ref="search"
                     onChange={this.handleChange}/>

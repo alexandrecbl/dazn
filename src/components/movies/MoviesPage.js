@@ -3,27 +3,33 @@ import MovieSearch from './MovieSearch';
 import MoviesList from './MoviesList';
 import themoviedb from "../../scripts/themoviedb";
 import {Subject} from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import {debounceTime} from 'rxjs/operators';
 import {API_KEY} from "../../config/config";
+import PropTypes from "prop-types";
+import {parseQuery} from "../../utils/utils";
 
 themoviedb.common.api_key = API_KEY;
 
-class MoviesPage extends React.Component{
+class MoviesPage extends React.Component {
     //initializes state and calls bind functions
-    constructor(props, context){
+    constructor(props, context) {
         super(props, context);
         this.state = {
             movies: null,
             defaultMovies: [],
-            searchKey: "",
+            searchKey: parseQuery('searchKey', this.props.location.search),
             debounced: "",
-            error:""
+            error: ""
         };
 
         //Create subject
         this.onSearch$ = new Subject();
         this.onSearchKeyChange = this.onSearchKeyChange.bind(this);
     }
+
+    onRowClick = (e) => {
+        this.context.router.history.push("movie/" + e.currentTarget.id + "?searchKey=" + this.state.searchKey);
+    };
 
     onSearchKeyChange = (searchKey) => {
         this.setState({searchKey});
@@ -33,23 +39,27 @@ class MoviesPage extends React.Component{
 
     searchMovies = (debounced) => {
         let that = this;
-        themoviedb.search.getMovie({query:debounced}, function (json) {
+        const onSuccess = function (json) {
             let movies = JSON.parse(json);
             if (movies.results && movies.results.length > 0) {
                 that.setState({
                     movies: movies.results,
                     debounced: '',
-                    error:''
+                    error: ''
                 });
-            }else{
+            } else {
                 //toastr.warning('Movie Not Found!');
                 that.setState({
                     error: 'Movie Not Found!'
                 });
             }
-        }, function () {
+        };
+
+        const onError = function (error) {
             //toastr.error('Error whilst searching movies!');
-        });
+        };
+
+        themoviedb.search.getMovie({query: debounced}, onSuccess, onError);
     };
 
     getDefaultMovies = () => {
@@ -72,7 +82,7 @@ class MoviesPage extends React.Component{
     };
 
     subscribe = () => {
-       //subscribe observable with debounce so we restrict api calls
+        //subscribe observable with debounce so we restrict api calls
         this.subscription = this.onSearch$.pipe(
             debounceTime(300))
             .subscribe(debounced => this.searchMovies(debounced));
@@ -80,6 +90,8 @@ class MoviesPage extends React.Component{
 
     componentDidMount = () => {
         this.subscribe();
+        if (this.state.searchKey)
+            this.searchMovies(this.state.searchKey);
         this.getDefaultMovies();
     };
 
@@ -90,7 +102,7 @@ class MoviesPage extends React.Component{
         }
     }
 
-    render(){
+    render() {
         //destructure what you want to use. Object is still mutable!
         const {movies, defaultMovies, searchKey, error} = this.state;
         //display the default list of movies if there is no search key
@@ -99,13 +111,17 @@ class MoviesPage extends React.Component{
         return (
             <div className="w-100">
                 <h1>Search</h1>
-                <MovieSearch onChange={this.onSearchKeyChange} error={error}/>
-                {filter.length>0 && <MoviesList movies={filter} onRowClick={this.onRowClick} imageURI={themoviedb.common.images_uri}/>}
+                <MovieSearch onChange={this.onSearchKeyChange} error={error} searchKey={this.state.searchKey}/>
+                {filter.length > 0 &&
+                <MoviesList movies={filter} onRowClick={this.onRowClick} imageURI={themoviedb.common.images_uri}/>}
             </div>
         );
     }
 }
 
+MoviesPage.contextTypes = {
+    router: PropTypes.object
+};
 
 export default MoviesPage;
 

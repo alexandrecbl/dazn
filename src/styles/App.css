@@ -22,8 +22,8 @@ nav a{
 
 }
 
-nav {
-    display: flex !important ;
+header nav {
+    display: flex ;
     flex: none;
     width: 100%;
     min-width: 600px;
@@ -31,9 +31,9 @@ nav {
     justify-content: flex-start;
 }
 
-a.active, a:hover {
-    color: white !important;
-    text-decoration: none !important;
+nav a.active, nav a:hover {
+    color: white;
+    text-decoration: none;
 }
 
 #content {
@@ -44,11 +44,15 @@ a.active, a:hover {
     justify-content: center;
 }
 
+.no-image:before {
+    content: ' ';
+    display: block;
+    position: absolute;
+    height: 50px;
+    width: 33px;
+}
+
 .row-hover:hover{
     cursor: pointer;
     background-color: #e6f5fb;
-}
-
-.jumbotron{
-    width: 100%;
 }

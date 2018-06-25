@@ -1,4 +1,5 @@
 import React from 'react';
+import {Link} from "react-router-dom";
 import themoviedb from "../../scripts/themoviedb";
 import MovieDetail from './MovieDetail';
 
@@ -35,7 +36,14 @@ class MovieDetailPage extends React.Component {
 
     render() {
         return (
-            <MovieDetail movie={this.state.movie}/>
+            <div>
+                <Link to={{
+                    pathname: '/movies',
+                    search: this.props.location.search
+                }}> &lt;Back</Link>
+                <MovieDetail movie={this.state.movie}/>
+            </div>
+
         )
     }
 }
