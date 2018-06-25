@@ -7,7 +7,7 @@ class MovieDetailPage extends React.Component {
 
     constructor(props, context) {
         super(props, context);
-        this.state = {movie: {}};
+        this.state = {movie: {}, loading:true};
     }
 
     getMovieDetails = () => {
@@ -17,7 +17,8 @@ class MovieDetailPage extends React.Component {
             movie = JSON.parse(movie);
             if (movie) {
                 that.setState({
-                    movie: movie
+                    movie: movie,
+                    loading:false
                 });
             }
         };
@@ -37,11 +38,11 @@ class MovieDetailPage extends React.Component {
     render() {
         return (
             <div>
-                <Link to={{
+                {!this.state.loading && <Link to={{
                     pathname: '/movies',
                     search: this.props.location.search
-                }}> &lt;Back</Link>
-                <MovieDetail movie={this.state.movie}/>
+                }}> &lt;Back</Link>}
+                <MovieDetail movie={this.state.movie} loading={this.state.loading}/>
             </div>
 
         )
