@@ -4,7 +4,7 @@ import themoviedb from "../../scripts/themoviedb";
 
 const MovieListRow = ({movie}) => {
     return (
-        <div className='jumbotron pt-3'>
+        <div className='jumbotron pt-3 w-100'>
 
             <h1>{movie.title}</h1>
             <p>{movie.overview}</p>
