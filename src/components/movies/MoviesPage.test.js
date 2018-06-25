@@ -7,8 +7,12 @@ import expect from 'expect';
 describe('MoviesPage Component', () => {
     it('renders without crashing', () => {
 
+        let location = {
+            search:'test'
+        };
+
         let div = document.createElement('div');
-        ReactDOM.render(<MoviesPage/>, div);
+        ReactDOM.render(<MoviesPage location={location}/>, div);
         ReactDOM.unmountComponentAtNode(div);
     });
 
