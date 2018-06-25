@@ -1,7 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import themoviedb from "../../scripts/themoviedb";
-import toastr from "toastr";
+import MovieDetail from './MovieDetail';
 
 class MovieDetailPage extends React.Component {
 
@@ -23,10 +22,10 @@ class MovieDetailPage extends React.Component {
         };
 
         const onError = function (error) {
-            toastr.error('Error while fetching movie!');
+            //toastr.error('Error while fetching movie!');
         };
 
-        themoviedb.movies.getById({id:this.props.match.params.id}, onSuccess, onError)
+        themoviedb.movies.getById({id: this.props.match.params.id}, onSuccess, onError)
     };
 
     componentDidMount = () => {
@@ -36,17 +35,9 @@ class MovieDetailPage extends React.Component {
 
     render() {
         return (
-            <div className='container'>
-                <div className='row'>
-
-                </div>
-            </div>
+            <MovieDetail movie={this.state.movie}/>
         )
     }
 }
-
-MovieDetailPage.propTypes = {
-    //myProp: PropTypes.string.isRequired
-};
 
 export default MovieDetailPage;
