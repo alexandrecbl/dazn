@@ -4,7 +4,6 @@ import MoviesList from './MoviesList';
 import themoviedb from "../../scripts/themoviedb";
 import {Subject} from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import toastr from 'toastr';
 import {API_KEY} from "../../config/config";
 
 themoviedb.common.api_key = API_KEY;
@@ -17,7 +16,8 @@ class MoviesPage extends React.Component{
             movies: null,
             defaultMovies: [],
             searchKey: "",
-            debounced: ""
+            debounced: "",
+            error:""
         };
 
         //Create subject
@@ -38,13 +38,17 @@ class MoviesPage extends React.Component{
             if (movies.results && movies.results.length > 0) {
                 that.setState({
                     movies: movies.results,
-                    debounced: ''
+                    debounced: '',
+                    error:''
                 });
             }else{
-                toastr.warning('Movie Not Found!');
+                //toastr.warning('Movie Not Found!');
+                that.setState({
+                    error: 'Movie Not Found!'
+                });
             }
         }, function () {
-            toastr.error('Error whilst searching movies!');
+            //toastr.error('Error whilst searching movies!');
         });
     };
 
@@ -61,7 +65,7 @@ class MoviesPage extends React.Component{
         };
 
         const onError = function (error) {
-            toastr.error('Error whilst searching movies!');
+            //toastr.error('Error whilst searching movies!');
         };
 
         themoviedb.movies.getPopular({}, onSuccess, onError)
@@ -88,14 +92,14 @@ class MoviesPage extends React.Component{
 
     render(){
         //destructure what you want to use. Object is still mutable!
-        const {movies, defaultMovies, searchKey} = this.state;
+        const {movies, defaultMovies, searchKey, error} = this.state;
         //display the default list of movies if there is no search key
         let filter = searchKey && movies ? movies : defaultMovies;
 
         return (
             <div className="w-100">
                 <h1>Search</h1>
-                <MovieSearch onChange={this.onSearchKeyChange}/>
+                <MovieSearch onChange={this.onSearchKeyChange} error={error}/>
                 {filter.length>0 && <MoviesList movies={filter} onRowClick={this.onRowClick} imageURI={themoviedb.common.images_uri}/>}
             </div>
         );
