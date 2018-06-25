@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 const MovieListRow = ({movie, onClick, imageURI}) => {
     return (
         <tr onClick={onClick} id={movie.id} className="row-hover">
-            <td>{movie.poster_path && <img src={imageURI+'h50/'+movie.poster_path} alt={movie.title}/>}</td>
+            <td>{movie.poster_path && <img src={imageURI+'h50/'+movie.poster_path} className="no-image" alt={movie.title}/>}</td>
             <td>{movie.title}</td>
             <td>{movie.release_date}</td>
             <td>{movie.original_language}</td>
