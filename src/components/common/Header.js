@@ -1,6 +1,6 @@
 import React from 'react';
 import {NavLink} from 'react-router-dom';
-const Header = ({loading}) => {
+const Header = () => {
     return (
         <header>
             <nav>

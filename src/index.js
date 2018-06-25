@@ -4,8 +4,6 @@ import {BrowserRouter} from 'react-router-dom'
 import App from './components/App';
 import Routes from './routes';
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
-import '../node_modules/font-awesome/css/font-awesome.min.css';
-//import registerServiceWorker from './registerServiceWorker';
 
 ReactDOM.render((
 
@@ -16,4 +14,3 @@ ReactDOM.render((
     </BrowserRouter>
 
 ), document.getElementById('root'));
-//registerServiceWorker();

@@ -1,7 +1,6 @@
 import React from 'react';
 
-class AboutPage extends React.Component{
-  render(){
+const AboutPage = () => {
     return (
         <div className="jumbotron w-100">
             <h1>About</h1>
@@ -9,7 +8,7 @@ class AboutPage extends React.Component{
             <p>It allows the user to search, browse and see movie details</p>
         </div>
     );
-  }
-}
+};
+
 
 export default AboutPage;
