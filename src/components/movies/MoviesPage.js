@@ -2,6 +2,9 @@ import React from 'react';
 import MovieSearch from './MovieSearch';
 import MoviesList from './MoviesList';
 import themoviedb from "../../scripts/themoviedb";
+import {Subject} from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+import toastr from 'toastr';
 import {API_KEY} from "../../config/config";
 
 themoviedb.common.api_key = API_KEY;
@@ -11,52 +14,86 @@ class MoviesPage extends React.Component{
     constructor(props, context){
         super(props, context);
         this.state = {
-            movies: {},
-            searchKey: ""
+            movies: null,
+            defaultMovies: [],
+            searchKey: "",
+            debounced: ""
         };
+
+        //Create subject
+        this.onSearch$ = new Subject();
+        this.onSearchKeyChange = this.onSearchKeyChange.bind(this);
     }
 
     onSearchKeyChange = (searchKey) => {
-        this.setState({searchKey: searchKey});
+        this.setState({searchKey});
+        //iterate observable
+        this.onSearch$.next(searchKey);
     };
 
-    getMovies = () => {
+    searchMovies = (debounced) => {
+        let that = this;
+        themoviedb.search.getMovie({query:debounced}, function (json) {
+            let movies = JSON.parse(json);
+            if (movies.results && movies.results.length > 0) {
+                that.setState({
+                    movies: movies.results,
+                    debounced: ''
+                });
+            }else{
+                toastr.warning('Movie Not Found!');
+            }
+        }, function () {
+            toastr.error('Error whilst searching movies!');
+        });
+    };
+
+    getDefaultMovies = () => {
         let that = this;
 
         const onSuccess = function (movies) {
             movies = JSON.parse(movies);
             if (movies.results && movies.results.length > 0) {
                 that.setState({
-                    movies: movies.results
+                    defaultMovies: movies.results
                 });
             }
         };
 
         const onError = function (error) {
-            //TODO: Call a message lib like toastr or redirect to an error page
-            //console.error(error);
+            toastr.error('Error whilst searching movies!');
         };
 
         themoviedb.movies.getPopular({}, onSuccess, onError)
     };
 
-    componentDidMount = () => {
-        this.getMovies();
+    subscribe = () => {
+       //subscribe observable with debounce so we restrict api calls
+        this.subscription = this.onSearch$.pipe(
+            debounceTime(300))
+            .subscribe(debounced => this.searchMovies(debounced));
     };
+
+    componentDidMount = () => {
+        this.subscribe();
+        this.getDefaultMovies();
+    };
+
+    componentWillUnmount() {
+        //unsubscribe observable
+        if (this.subscription) {
+            this.subscription.unsubscribe();
+        }
+    }
 
     render(){
         //destructure what you want to use. Object is still mutable!
-        const {movies, searchKey} = this.state;
-        let filter = movies;
-        if (searchKey && typeof searchKey === "string") {
-            filter = this.state.movies.filter((value) => {
-                return value.title.toLowerCase().match(searchKey.trim()) != null
-            })
-        }
+        const {movies, defaultMovies, searchKey} = this.state;
+        //display the default list of movies if there is no search key
+        let filter = searchKey && movies ? movies : defaultMovies;
 
-        themoviedb.search.getMovie({query:'test'});
         return (
-            <div style={{width: '100%'}}>
+            <div className="w-100">
                 <h1>Search</h1>
                 <MovieSearch onChange={this.onSearchKeyChange}/>
                 {filter.length>0 && <MoviesList movies={filter} onRowClick={this.onRowClick} imageURI={themoviedb.common.images_uri}/>}
@@ -65,9 +102,6 @@ class MoviesPage extends React.Component{
     }
 }
 
-MoviesPage.propTypes = {
-    //myProp: PropTypes.string.isRequired
-};
 
 export default MoviesPage;
 
